@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <%- include('partials/head'); %>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <%- include('partials/header'); %>
+    </header>
+
+    <main role="main" class="container">
+      <% if (!user) { %>
+      <%- include('partials/loginform'); %>
+      <% } %>
+    </main>
+    <footer class="container">
+      <%- include('partials/footer'); %>
+    </footer>
+  </div>
+</body>
+
+</html>

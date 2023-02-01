@@ -1,0 +1,28 @@
+<form class="form-register" method="post" action="/register">
+  <div class="mb-3">
+    <h1 class="h3 font-weight-normal">Please Register</h1>
+  </div>
+  <div class="mb-3">
+    <label for="username" class="col-form-label">Username</label>
+    <input type="text" id="username" name="username" class="form-control" placeholder="Username" required minlength="8">
+  </div>
+  <div class="mb-3">
+    <label for="firstName" class="col-form-label">First Name</label>
+    <input type="text" id="firstName" name="firstName" class="form-control" required minlength="8">
+  </div>
+  <div class="mb-3">
+    <label for="familyName" class="col-form-label">Family Name</label>
+    <input type="text" id="familyName" name="familyName" class="form-control" required minlength="8">
+  </div>
+  <div class="mb-3">
+    <label for="password" class="col-form-label">Password</label>
+    <input type="password" id="password" name="password" class="form-control" aria-describedby="passwordHelpInline"
+      placeholder="Password" required>
+    <span id="passwordHelpInline" class="form-text">
+      Must be minimum 8 characters, and have minumum 1 lowercase, 1 uppercase, 1 number and 1 symbol.
+    </span>
+  </div>
+  <div class="mb-3">
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Register</button>
+  </div>
+</form>

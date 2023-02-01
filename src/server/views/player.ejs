@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <%- include('partials/head'); %>
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then DataTables and final PapaParse -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</head>
+
+<body>
+  <div>
+    <header>
+      <%- include('partials/header'); %>
+    </header>
+
+    <main role="main" class="container">
+      <% if (user) { %>
+      <div class="row pt-3">
+        <div class="col">
+          <div class="embed-responsive embed-responsive-16by9">
+            <iframe class="embed-responsive-item" id="playerframe"></iframe>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        var item = null;
+      </script>
+      <% if (item) { %>
+      <script>
+        item = JSON.parse('<%- JSON.stringify(item) %>');
+        var aiccParameters = JSON.parse('<%- JSON.stringify(aiccparameters) %>');
+      </script>
+      <% } %>
+      <script>
+        $(document).ready(function () {
+
+          if (item) {
+            var aiccLaunchUrl = item.launchurl.indexOf('?') > 0 ? item.launchurl + '&aicc_sid=' + aiccParameters.aicc_sid + '&aicc_url=' + aiccParameters.aicc_url : item.launchurl + '?aicc_sid=' + aiccParameters.aicc_sid + '&aicc_url=' + aiccParameters.aicc_url;
+            $('#playerframe').attr('src', aiccLaunchUrl);
+          }
+        });
+      </script>
+
+
+      <% } %>
+    </main>
+    <footer class="container">
+      <%- include('partials/footer'); %>
+    </footer>
+  </div>
+</body>
+
+</html>
