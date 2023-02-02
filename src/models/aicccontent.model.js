@@ -28,10 +28,6 @@ const aicccontentSchema = new Schema(
   { timestamps: true },
 );
 
-aicccontentSchema.methods.toJSON = () => {
-  return this.toObject();
-};
-
 const AiccContent = model('AiccContent', aicccontentSchema);
 
 module.exports = AiccContent;

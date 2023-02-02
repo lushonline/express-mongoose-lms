@@ -37,7 +37,7 @@
         $(document).ready(function () {
 
           if (item) {
-            var aiccLaunchUrl = item.launchurl.indexOf('?') > 0 ? item.launchurl + '&aicc_sid=' + aiccParameters.aicc_sid + '&aicc_url=' + aiccParameters.aicc_url : item.launchurl + '?aicc_sid=' + aiccParameters.aicc_sid + '&aicc_url=' + aiccParameters.aicc_url;
+            var aiccLaunchUrl = item.launchurl.indexOf('?') > 0 ? item.launchurl + '&aicc_sid=' + aiccParameters.aicc_sid + '-'+ item.id + '&aicc_url=' + aiccParameters.aicc_url : item.launchurl + '?aicc_sid=' + aiccParameters.aicc_sid + '-'+ item.id + '&aicc_url=' + aiccParameters.aicc_url;
             $('#playerframe').attr('src', aiccLaunchUrl);
           }
         });

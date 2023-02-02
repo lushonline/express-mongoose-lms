@@ -1,3 +1,4 @@
+/* eslint-disable func-names */
 const { Schema, model } = require('mongoose');
 const passportLocalMongoose = require('passport-local-mongoose');
 const { isEmail, isStrongPassword } = require('validator');
@@ -22,25 +23,19 @@ const userSchema = new Schema(
       type: Boolean,
     },
   },
-  { timestamps: true },
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } },
 );
 
 // Virtual for AICC student_name
-userSchema.virtual('student_name').get(() => {
+userSchema.virtual('student_name').get(function () {
   return `${this.familyName}, ${this.firstName}`;
 });
 
 // Virtual for AICC student_id
-userSchema.virtual('student_id').get(() => {
+userSchema.virtual('student_id').get(function () {
   // eslint-disable-next-line no-underscore-dangle
-  return this._id;
+  return this._id.toString();
 });
-
-userSchema.methods.toJSON = () => {
-  const userObj = this.toObject();
-  delete userObj.password;
-  return userObj;
-};
 
 const passwordValidator = (password, cb) => {
   if (!isStrongPassword(password)) {

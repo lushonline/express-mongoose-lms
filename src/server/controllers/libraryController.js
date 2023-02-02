@@ -24,8 +24,8 @@ const getAbsoluteUrl = (req, relativeUrl) => {
 
 const get = (req, res) => {
   const studentObject = {
-    studentId: req.user.studentId,
-    studentName: `${req.user.lastName}, ${req.user.firstName}`,
+    studentId: req.user.student_id,
+    studentName: req.user.student_name,
   };
 
   const aiccparameters = {
