@@ -53,7 +53,7 @@
               { data: "title", title: "Title" },
               {
                 data: "launchurl", className: "launch", title: "Launch", render: function (data, type, row, meta) {
-                  var aiccLaunchUrl = data.indexOf('?') > 0 ? data + '&aicc_sid=' + aiccParameters.aicc_sid + '-'+ row.id + '&aicc_url=' + aiccParameters.aicc_url : data + '?aicc_sid=' + aiccParameters.aicc_sid + '-'+ row.id + '&aicc_url=' + aiccParameters.aicc_url;
+                  var aiccLaunchUrl = data.indexOf('?') > 0 ? data + '&aicc_sid=' + aiccParameters.aicc_sid + '-'+ row._id + '&aicc_url=' + aiccParameters.aicc_url : data + '?aicc_sid=' + aiccParameters.aicc_sid + '-'+ row._id + '&aicc_url=' + aiccParameters.aicc_url;
                   return "<div class='p-1'><a class='btn btn-primary' href='" + aiccLaunchUrl + "'role='button' target='CoursePopupWindow' onclick='openRequestedPopup(this.href, this.target, 1280, 768); return false;'>Launch</a></div>";
                 }
               }
