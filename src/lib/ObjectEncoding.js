@@ -11,7 +11,8 @@ class ObjectEncoding {
   }
 
   decode(str) {
-    return JSON.parse(this.encoder.decode(str));
+    const decoded = Buffer.from(this.encoder.decode(str)).toString();
+    return JSON.parse(decoded);
   }
 }
 
