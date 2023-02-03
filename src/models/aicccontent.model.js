@@ -24,6 +24,9 @@ const aicccontentSchema = new Schema(
       type: Boolean,
       default: true,
     },
+    launchdata: {
+      type: String,
+    },
   },
   { timestamps: true },
 );

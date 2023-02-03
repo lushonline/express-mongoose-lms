@@ -1,9 +1,12 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable func-names */
 const { Schema, model } = require('mongoose');
 const cmivalidators = require('../lib/cmi.validators');
 
-const cmiSchema = new Schema(
+const cmidataSchema = new Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User' },
+    aicccontent: { type: Schema.Types.ObjectId, ref: 'AiccContent' },
     core: {
       student_id: {
         type: String,
@@ -80,10 +83,11 @@ const cmiSchema = new Schema(
       validate: cmivalidators.IsCmiString4096,
       default: '',
     },
+    exitau: { type: Boolean, default: false },
   },
   { timestamps: true },
 );
 
-const CmiData = model('CMI', cmiSchema);
+const CmiData = model('CMI', cmidataSchema);
 
 module.exports = CmiData;

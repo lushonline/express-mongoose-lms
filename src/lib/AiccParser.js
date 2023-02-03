@@ -10,7 +10,7 @@ class AiccParser {
     this.bookmark = null;
     this.aiccdatastring = null;
     this.parsed = {
-      cmi: {},
+      cmi: { core: { score: {} }, suspend_data: '', launch_data: '' },
       command: null,
       sessionId: null,
       error: null,
@@ -40,25 +40,29 @@ class AiccParser {
     let response = true;
     switch (this.key.toUpperCase()) {
       case AiccConstants.STUDENT_ID.toUpperCase():
-        this.parsed.cmi.StudentID = this.value;
+        this.parsed.cmi.core.student_id = this.value;
         break;
       case AiccConstants.STUDENT_NAME.toUpperCase():
-        this.parsed.cmi.StudentName = this.value;
+        this.parsed.cmi.core.student_name = this.value;
         break;
       case AiccConstants.LESSON_LOCATION.toUpperCase():
-        this.parsed.cmi.LessonLocation = this.value;
+        this.parsed.cmi.core.lesson_location = this.value;
         break;
       case AiccConstants.CREDIT.toUpperCase():
-        this.parsed.cmi.Credit = this.value;
+        this.parsed.cmi.core.credit = this.value;
         break;
       case AiccConstants.LESSON_STATUS.toUpperCase():
-        this.parsed.cmi.LessonStatus = this.value;
+        this.parsed.cmi.core.lesson_status = this.value;
         break;
-      case AiccConstants.SCORE.toUpperCase():
-        this.parsed.cmi.Score = this.normalizeScore(this.value);
+      case AiccConstants.SCORE.toUpperCase(): {
+        const score = this.normalizeScore(this.value);
+        if (score) {
+          this.parsed.cmi.core.score.raw = score;
+        }
         break;
+      }
       case AiccConstants.TIME.toUpperCase():
-        this.parsed.cmi.duration = this.value;
+        this.parsed.cmi.core.session_time = this.value;
         break;
       default:
         response = false;
@@ -68,7 +72,7 @@ class AiccParser {
 
   setAICCCoreLesson() {
     if (this.block != null && this.equalsIgnoreCase(this.block, AiccConstants.CORE_LESSON)) {
-      this.parsed.cmi.CoreLesson = this.value;
+      this.parsed.cmi.suspend_data = this.value;
       return true;
     }
     return false;
@@ -76,15 +80,7 @@ class AiccParser {
 
   setAICCCoreVendor() {
     if (this.equalsIgnoreCase(this.key, AiccConstants.CORE_VENDOR)) {
-      this.parsed.cmi.CoreVendor = this.value;
-      return true;
-    }
-    return false;
-  }
-
-  setAICCComments() {
-    if (this.equalsIgnoreCase(this.key, AiccConstants.COMMENTS)) {
-      this.parsed.cmi.Comment = this.value;
+      this.parsed.cmi.launch_data = this.value;
       return true;
     }
     return false;
@@ -97,7 +93,7 @@ class AiccParser {
         this.parsed.command = this.value;
         break;
       case AiccConstants.SESSION_ID.toUpperCase():
-        this.parsed.cessionId = this.value;
+        this.parsed.sessionId = this.value;
         break;
       case AiccConstants.ERROR.toUpperCase():
         this.parsed.error = this.value;
@@ -109,31 +105,6 @@ class AiccParser {
         response = false;
     }
     return response;
-  }
-
-  setAICCStudentDemographics() {
-    this.parsed.cmi.StudentDemographics = null;
-    return false;
-  }
-
-  setAICCStudentPreferences() {
-    this.parsed.cmi.StudentPreferences = null;
-    return false;
-  }
-
-  setAICCStudentData() {
-    this.parsed.cmi.StudentData = null;
-    return false;
-  }
-
-  setAICCObjectivesStatus() {
-    this.parsed.cmi.ObjectiveStatus = null;
-    return false;
-  }
-
-  setAICCEvaluation() {
-    this.parsed.cmi.Evaluation = null;
-    return false;
   }
 
   parseAICCData() {
@@ -161,7 +132,7 @@ class AiccParser {
         } else {
           this.value = b;
         }
-        if (this.setAICCCoreLesson() || this.setAICCCoreVendor() || this.setAICCComments()) {
+        if (this.setAICCCoreLesson() || this.setAICCCoreVendor()) {
           continue;
         }
       } else {
@@ -187,16 +158,7 @@ class AiccParser {
         ) {
           b = this.value;
         }
-        if (
-          this.setAICCHACPHeaderInformation() ||
-          this.setAICCCore() ||
-          this.setAICCCoreLesson() ||
-          this.setAICCEvaluation() ||
-          this.setAICCObjectivesStatus() ||
-          this.setAICCStudentData() ||
-          this.setAICCStudentDemographics() ||
-          this.setAICCStudentPreferences()
-        ) {
+        if (this.setAICCHACPHeaderInformation() || this.setAICCCore() || this.setAICCCoreLesson()) {
           continue;
         }
       }
