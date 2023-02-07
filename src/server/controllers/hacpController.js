@@ -1,21 +1,18 @@
 const formidable = require('formidable');
 const { isNil } = require('lodash');
 const mongoose = require('mongoose');
-const moment = require('moment');
-const momentDurationFormatSetup = require('moment-duration-format');
 
-const { AiccParser } = require('../../lib/AiccParser');
-const { ObjectEncoding } = require('../../lib/ObjectEncoding');
+const Parser = require('../../lib/aicc/parser');
+const aiccutils = require('../../lib/aicc/util');
+const { ObjectEncoding } = require('../../lib/utils/objectencoding');
 
 const models = require('../../models');
 
-const parser = new AiccParser();
+const parser = new Parser();
 const objectencoder = new ObjectEncoding();
-momentDurationFormatSetup(moment);
 
 const parseAiccRequest = (fields) => {
-  parser.stringToParse(fields.aicc_data || '');
-  parser.parseAICCData();
+  parser.parseAICCData(fields.aicc_data || '');
   const response = parser.aiccdata;
   response.command = fields.command ? fields.command : null;
   response.version = fields.version ? fields.version : '2.2';
@@ -23,44 +20,132 @@ const parseAiccRequest = (fields) => {
   return response;
 };
 
+const getCmiTracks = async (sessionId) => {
+  const [sessionid, contentId] = sessionId.split('-');
+  if (isNil(contentId) || isNil(sessionid)) {
+    throw new Error('Invalid Session ID');
+  }
+  const { studentId, studentName, attempt = 1 } = objectencoder.decode(sessionid);
+
+  const filter = {
+    user: mongoose.Types.ObjectId(studentId),
+    aicccontent: mongoose.Types.ObjectId(contentId),
+    attempt,
+  };
+
+  const defaults = {
+    'cmi.core.student_id': studentId,
+    'cmi.core.student_name': studentName,
+    'cmi.core.entry': 'ab-initio',
+    'cmi.core.exit': '',
+    'cmi.core.lesson_status': 'not attempted',
+    'cmi.core.lesson_location': '',
+    'cmi.core.credit': 'credit',
+    'cmi.core.score.raw': '',
+    'cmi.core.score.min': '0',
+    'cmi.core.score.max': '100',
+    'cmi.core.total_time': '00:00:00',
+    'cmi.core.lesson_mode': 'normal',
+    'cmi.suspend_data': '',
+    'cmi.launch_data': '',
+  };
+
+  let obj = {};
+  await models.CmiTrack.find(filter).then((cmitracks) => {
+    obj = cmitracks.reduce((accumulator, currentValue) => {
+      return {
+        ...accumulator,
+        [currentValue.element]: currentValue.value,
+      };
+    }, obj);
+  });
+  return { ...defaults, ...obj };
+};
+
+const formatCMITracks = (cmitracks) => {
+  const score =
+    cmitracks['cmi.core.score.raw'] !== ''
+      ? `${cmitracks['cmi.core.score.raw']},${cmitracks['cmi.core.score.max']},${cmitracks['cmi.core.score.min']}`
+      : '';
+
+  const status =
+    cmitracks['cmi.core.entry'] === ''
+      ? `${cmitracks['cmi.core.lesson_status']}`
+      : `${cmitracks['cmi.core.lesson_status']}, ${cmitracks['cmi.core.entry']}`;
+
+  const items = [
+    '[core]',
+    `student_id=${cmitracks['cmi.core.student_id']}`,
+    `student_name=${cmitracks['cmi.core.student_name']}`,
+    `credit=${cmitracks['cmi.core.credit']}`,
+    `lesson_location=${cmitracks['cmi.core.lesson_location']}`,
+    `lesson_status=${status}`,
+    `score=${score}`,
+    `time=${cmitracks['cmi.core.total_time']}`,
+    `lesson_mode=${cmitracks['cmi.core.lesson_mode']}`,
+    '[Core_Lesson]',
+    `${cmitracks['cmi.suspend_data']}`,
+    '[Core_Vendor]',
+    `${cmitracks['cmi.launch_data']}`,
+  ];
+  return items.join('\r\n');
+};
+
+const updateTotalTime = async (sessionId) => {
+  const [sessionid, contentId] = sessionId.split('-');
+  if (isNil(contentId) || isNil(sessionid)) {
+    throw new Error('Invalid Session ID');
+  }
+  const { studentId, attempt = 1 } = objectencoder.decode(sessionid);
+
+  const filter = {
+    user: mongoose.Types.ObjectId(studentId),
+    aicccontent: mongoose.Types.ObjectId(contentId),
+    attempt,
+  };
+
+  const totalTime = await models.CmiTrack.findOne({
+    ...filter,
+    element: 'cmi.core.total_time',
+  }).exec();
+
+  const sessionTime = await models.CmiTrack.findOneAndDelete({
+    ...filter,
+    element: 'cmi.core.session_time',
+  }).exec();
+
+  const combined = aiccutils.addTimes(
+    sessionTime ? sessionTime.value : '00:00:00',
+    totalTime ? totalTime.value : '00:00:00',
+  );
+
+  const promises = [];
+
+  promises.push(
+    models.CmiTrack.updateOne(
+      { ...filter, element: 'cmi.core.total_time' },
+      {
+        value: combined,
+      },
+      {
+        upsert: true,
+      },
+    ).exec(),
+  );
+
+  return Promise.allSettled(promises);
+};
+
 const processGetParam = async (aiccrequest) => {
   let errorNumber = 0;
   let errorText = 'Successful';
   let aiccdata = null;
   const { version, sessionId } = aiccrequest;
-  let student = null;
 
   try {
-    const [sessionid, identifier] = sessionId.split('-');
-    if (isNil(identifier) || isNil(sessionid)) {
-      throw new Error('Invalid Session ID');
-    }
-    student = objectencoder.decode(sessionid);
-    aiccdata = `[core]\r\nstudent_id=${student.studentId}\r\nstudent_name=${student.studentName}\r\ncredit=C\r\nlesson_location=\r\nlesson_status=not attempted, ab-initio\r\nscore=\r\ntime=00:00:00\r\nLesson_Mode=normal\r\n[Core_Lesson]\r\n[Core_Vendor]\r\n[Evaluation]\r\nCourse_ID=${identifier}`;
-
-    const filter = {
-      user: mongoose.Types.ObjectId(student.studentId),
-      aicccontent: mongoose.Types.ObjectId(identifier),
-    };
-
-    await models.CmiData.findOne(filter).then((cmidata) => {
-      if (cmidata) {
-        const items = [
-          '[core]',
-          `student_id=${student.studentId}`,
-          `student_name=${student.studentName}`,
-          `credit=${cmidata.core.credit}`,
-          `lesson_location=${cmidata.core.lesson_location}`,
-          `lesson_status=${cmidata.core.lesson_status}`,
-          `score=${cmidata.core.score.raw ? cmidata.core.score.raw : ''}`,
-          `time=${cmidata.core.total_time}`,
-          `lesson_mode=${cmidata.core.lesson_mode}`,
-          '[Core_Lesson]',
-          `${cmidata.suspend_data}`,
-        ];
-
-        aiccdata = items.join('\r\n');
-      }
+    await updateTotalTime(sessionId);
+    aiccdata = await getCmiTracks(sessionId).then((results) => {
+      return formatCMITracks(results);
     });
   } catch (error) {
     errorNumber = 3;
@@ -84,34 +169,85 @@ const processPutParam = async (aiccrequest) => {
     }
     const student = objectencoder.decode(sessionid);
 
-    const cmidata = {
-      'core.student_id': student.studentId,
-      'core.student_name': student.studentName,
-      'core.lesson_status': aiccrequest.cmi.core.lesson_status,
-      'core.session_time': aiccrequest.cmi.core.session_time,
-      'core.lesson_location': aiccrequest.cmi.core.lesson_location || '',
-      'core.entry': '',
-      exitau: false,
-      martin: false,
-    };
-
-    if (aiccrequest.cmi.core.score.raw) {
-      cmidata['core.score.raw'] = aiccrequest.cmi.core.score.raw || '';
-    }
-
     const filter = {
       user: mongoose.Types.ObjectId(student.studentId),
       aicccontent: mongoose.Types.ObjectId(identifier),
+      attempt: 1,
     };
 
-    const res = await models.CmiData.updateOne(
-      filter,
-      { $set: cmidata },
-      {
-        upsert: true,
-      },
+    const promises = [];
+
+    promises.push(
+      models.CmiTrack.updateOne(
+        { ...filter, element: 'cmi.core.lesson_status' },
+        {
+          value: aiccrequest.cmi.core.lesson_status
+            ? aiccrequest.cmi.core.lesson_status
+            : 'incomplete',
+        },
+        {
+          upsert: true,
+        },
+      ).exec(),
     );
-    console.log(res);
+
+    promises.push(
+      models.CmiTrack.updateOne(
+        { ...filter, element: 'cmi.core.lesson_location' },
+        {
+          value: aiccrequest.cmi.core.lesson_location ? aiccrequest.cmi.core.lesson_location : '',
+        },
+        {
+          upsert: true,
+        },
+      ).exec(),
+    );
+
+    promises.push(
+      models.CmiTrack.updateOne(
+        { ...filter, element: 'cmi.core.entry' },
+        {
+          $set: {
+            value: '',
+          },
+        },
+        {
+          upsert: true,
+        },
+      ).exec(),
+    );
+
+    promises.push(
+      models.CmiTrack.updateOne(
+        { ...filter, element: 'cmi.core.score.raw' },
+        {
+          $set: {
+            value: aiccrequest.cmi.core.score.raw ? aiccrequest.cmi.core.score.raw : '',
+          },
+        },
+        {
+          upsert: true,
+        },
+      ).exec(),
+    );
+
+    promises.push(
+      models.CmiTrack.updateOne(
+        { ...filter, element: 'cmi.core.session_time' },
+        {
+          $set: {
+            value: aiccrequest.cmi.core.session_time
+              ? aiccrequest.cmi.core.session_time
+              : '00:00:00',
+          },
+        },
+        {
+          upsert: true,
+        },
+      ).exec(),
+    );
+
+    await Promise.allSettled(promises);
   } catch (error) {
     errorNumber = 3;
     errorText = 'Invalid Session ID';
@@ -126,32 +262,7 @@ const processExitAu = async (aiccrequest) => {
   const { version, sessionId } = aiccrequest;
 
   try {
-    const [sessionid, identifier] = sessionId.split('-');
-    if (isNil(identifier) || isNil(sessionid)) {
-      throw new Error('Invalid Session ID');
-    }
-
-    const student = objectencoder.decode(sessionid);
-
-    const filter = {
-      user: mongoose.Types.ObjectId(student.studentId),
-      aicccontent: mongoose.Types.ObjectId(identifier),
-    };
-
-    // Find one adventure whose `country` is 'Croatia', otherwise `null`
-    const doc = await models.CmiData.findOne(filter).exec();
-    const sessionDuration = moment.duration(doc.core.session_time).asSeconds();
-    const totalDuration = moment.duration(doc.core.total_time).asSeconds();
-
-    const combined = moment
-      .duration(sessionDuration + totalDuration, 'seconds')
-      .format('hh:mm:ss', { trim: false });
-
-    doc.exitau = true;
-    doc.core.total_time = combined;
-
-    const res = await doc.save();
-    console.log(res);
+    await updateTotalTime(sessionId);
   } catch (error) {
     errorNumber = 3;
     errorText = 'Invalid Session ID';

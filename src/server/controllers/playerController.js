@@ -1,5 +1,5 @@
 const { AiccContent } = require('../../models');
-const { ObjectEncoding } = require('../../lib/ObjectEncoding');
+const { ObjectEncoding } = require('../../lib/utils/objectencoding');
 
 const objectencoder = new ObjectEncoding();
 

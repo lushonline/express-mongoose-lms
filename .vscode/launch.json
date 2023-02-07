@@ -19,6 +19,15 @@
       }
     },
     {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Server Only",
+      "program": "${workspaceFolder}/src/index.js",
+      "env": {
+        "DEBUG": ""
+      }
+    },
+    {
       "name": "Docker Node.js Launch",
       "type": "docker",
       "request": "launch",

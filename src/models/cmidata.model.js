@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable func-names */
 const { Schema, model } = require('mongoose');
-const cmivalidators = require('../lib/cmi.validators');
+const cmivalidators = require('../lib/aicc/validators');
 
 const cmidataSchema = new Schema(
   {
@@ -10,51 +10,51 @@ const cmidataSchema = new Schema(
     core: {
       student_id: {
         type: String,
-        validate: cmivalidators.IsCmiIdentifier,
+        validate: cmivalidators.IsCmiIdentifierINI,
       },
       student_name: {
         type: String,
-        validate: cmivalidators.IsCmiString255,
+        validate: cmivalidators.IsCmiString255INI,
       },
       lesson_location: {
         type: String,
-        validate: cmivalidators.IsCmiString255,
+        validate: cmivalidators.IsCmiString255INI,
         default: '',
       },
       credit: {
         type: String,
-        validate: cmivalidators.IsCmiCredit,
+        validate: cmivalidators.IsCmiVocabularyCredit,
         default: 'credit',
       },
       lesson_status: {
         type: String,
-        validate: cmivalidators.IsCmiStatus,
+        validate: cmivalidators.IsCmiVocabularyINIStatus,
         default: 'not attempted',
       },
       exit: {
         type: String,
-        validate: cmivalidators.IsCmiExit,
+        validate: cmivalidators.IsCmiVocabularyExit,
       },
       entry: {
         type: String,
-        validate: cmivalidators.IsCmiEntry,
+        validate: cmivalidators.IsCmiVocabularyEntry,
         default: 'ab-initio',
       },
       score: {
         raw: {
-          type: Number,
-          validate: cmivalidators.IsCmiDecimal0To100OrBlank,
+          type: String,
+          validate: cmivalidators.IsCmiDecimal,
           default: '',
         },
         min: {
-          type: Number,
-          validate: cmivalidators.IsCmiDecimal0To100OrBlank,
-          default: 0,
+          type: String,
+          validate: cmivalidators.IsCmiDecimal,
+          default: '0',
         },
         max: {
-          type: Number,
-          validate: cmivalidators.IsCmiDecimal0To100OrBlank,
-          default: 100,
+          type: String,
+          validate: cmivalidators.IsCmiDecimal,
+          default: '100',
         },
       },
       session_time: {
@@ -69,18 +69,18 @@ const cmidataSchema = new Schema(
       },
       lesson_mode: {
         type: String,
-        validate: cmivalidators.IsCmiLessonMode,
+        validate: cmivalidators.IsCmiVocabularyINIMode,
         default: 'normal',
       },
     },
     suspend_data: {
       type: String,
-      validate: cmivalidators.IsCmiString4096,
+      validate: cmivalidators.IsCmiString4096INI,
       default: '',
     },
     launch_data: {
       type: String,
-      validate: cmivalidators.IsCmiString4096,
+      validate: cmivalidators.IsCmiString4096INI,
       default: '',
     },
     exitau: { type: Boolean, default: false },

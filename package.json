@@ -6,6 +6,7 @@
     "scripts": {
         "start": "node ./src/index.js",
         "seeddata": "node ./scripts/seedDatabase.js",
+        "validators": "node ./scripts/testvalidators.js",
         "watch": "nodemon ./src/index.js",
         "lint": "eslint .",
         "preversion": "npm run lint",

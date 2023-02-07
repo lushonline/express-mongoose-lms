@@ -62,7 +62,7 @@ app.use('/library', library);
 app.use('/hacp', hacp);
 app.use('/register', register);
 
-// if error is not an instanceOf APIError, convert it.
+// if error is not an instanceOf APPError, convert it.
 app.use((err, req, res, next) => {
   if (!(err instanceof APPError)) {
     const apiError = new APPError(err.message, err.status, err.isPublic);
