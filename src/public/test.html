@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+
+    <h2>JavaScript Arrays</h2>
+
+    <p>Subtract the numbers in the array, starting from the left:</p>
+
+    <p id="demo"></p>
+
+    <script>
+        const data = [{
+            "_id": "63e12524817f729c5d7d7861",
+            "aicccontent": {
+                "_id": "63e0e7b972604ad248fdc150",
+                "code": "9a4d950e-f81b-4f0b-b73d-9160db57343e",
+                "title": "Access 2019: Creating Forms & Queries",
+                "type": "Non-Compliance",
+                "launchurl": "https://api.percipio.com/content-integration/v1/aicc/launch?contentId=9a4d950e-f81b-4f0b-b73d-9160db57343e&entitlementKey=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXJ2aWNlX2FjY291bnRfaWQiOiI2NjcxMzU1NC0yZmQ0LTRkNjgtOGVmZS0yNDdlMzQzZTMwZjYiLCJvcmdhbml6YXRpb25faWQiOiI2NjcxMzU1NC0yZmQ0LTRkNjgtOGVmZS0yNDdlMzQzZTMwZjYiLCJpc3MiOiJhcGkucGVyY2lwaW8uY29tIiwiaWF0IjoxNjAyNjgwNDg5fQ.C5YWQOPCpW1OG5Lzt8CQAklFvVSgBPSXYuzBN1NP31s&contentType=course",
+                "active": true,
+                "__v": 0,
+                "createdAt": "2023-02-06T11:42:50.001Z",
+                "updatedAt": "2023-02-06T11:42:50.001Z"
+            },
+            "attempt": 1,
+            "element": "cmi.core.lesson_status",
+            "user": "63e0e7b972604ad248fdc14d",
+            "__v": 0,
+            "createdAt": "2023-02-06T16:04:52.413Z",
+            "updatedAt": "2023-02-07T09:55:04.954Z",
+            "value": "Incomplete"
+        }, {
+            "_id": "63e1266f817f729c5d7d78da",
+            "aicccontent": {
+                "_id": "63e0e7b972604ad248fdc151",
+                "code": "A0000",
+                "title": "test for stand alone via ACCP",
+                "type": "Certitude",
+                "launchurl": "https://Certitude.skillsoftcompliance.com/player/?OrganizationID=9fa27e39-14e2-438e-a793-6bf596a636dc&MainProductID=b048989c-db87-4449-91bb-fb5781eedf8b&LanguageID=1033",
+                "active": true,
+                "__v": 0,
+                "createdAt": "2023-02-06T11:42:50.001Z",
+                "updatedAt": "2023-02-06T11:42:50.001Z"
+            },
+            "attempt": 1,
+            "element": "cmi.core.lesson_status",
+            "user": "63e0e7b972604ad248fdc14d",
+            "__v": 0,
+            "createdAt": "2023-02-06T16:10:23.372Z",
+            "updatedAt": "2023-02-07T09:26:56.849Z",
+            "value": "Incomplete"
+        }, {
+            "_id": "63e12994817f729c5d7d7a74",
+            "aicccontent": {
+                "_id": "63e0e7b972604ad248fdc151",
+                "code": "A0000",
+                "title": "test for stand alone via ACCP",
+                "type": "Certitude",
+                "launchurl": "https://Certitude.skillsoftcompliance.com/player/?OrganizationID=9fa27e39-14e2-438e-a793-6bf596a636dc&MainProductID=b048989c-db87-4449-91bb-fb5781eedf8b&LanguageID=1033",
+                "active": true,
+                "__v": 0,
+                "createdAt": "2023-02-06T11:42:50.001Z",
+                "updatedAt": "2023-02-06T11:42:50.001Z"
+            },
+            "attempt": 1,
+            "element": "cmi.core.total_time",
+            "user": "63e0e7b972604ad248fdc14d",
+            "__v": 0,
+            "createdAt": "2023-02-06T16:23:48.617Z",
+            "updatedAt": "2023-02-07T09:26:59.094Z",
+            "value": "00:03:28"
+        }, {
+            "_id": "63e12d55817f729c5d7d7ccf",
+            "aicccontent": {
+                "_id": "63e0e7b972604ad248fdc150",
+                "code": "9a4d950e-f81b-4f0b-b73d-9160db57343e",
+                "title": "Access 2019: Creating Forms & Queries",
+                "type": "Non-Compliance",
+                "launchurl": "https://api.percipio.com/content-integration/v1/aicc/launch?contentId=9a4d950e-f81b-4f0b-b73d-9160db57343e&entitlementKey=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXJ2aWNlX2FjY291bnRfaWQiOiI2NjcxMzU1NC0yZmQ0LTRkNjgtOGVmZS0yNDdlMzQzZTMwZjYiLCJvcmdhbml6YXRpb25faWQiOiI2NjcxMzU1NC0yZmQ0LTRkNjgtOGVmZS0yNDdlMzQzZTMwZjYiLCJpc3MiOiJhcGkucGVyY2lwaW8uY29tIiwiaWF0IjoxNjAyNjgwNDg5fQ.C5YWQOPCpW1OG5Lzt8CQAklFvVSgBPSXYuzBN1NP31s&contentType=course",
+                "active": true,
+                "__v": 0,
+                "createdAt": "2023-02-06T11:42:50.001Z",
+                "updatedAt": "2023-02-06T11:42:50.001Z"
+            },
+            "attempt": 1,
+            "element": "cmi.core.total_time",
+            "user": "63e0e7b972604ad248fdc14d",
+            "__v": 0,
+            "createdAt": "2023-02-06T16:39:49.766Z",
+            "updatedAt": "2023-02-07T09:55:05.195Z",
+            "value": "00:21:51"
+        }
+        ];
+
+        function reducer(accumulator, currentValue, index) {
+            const {
+                code,
+                type,
+                title
+            } = currentValue.aicccontent;
+            const {
+                element,
+                value
+            } = currentValue;
+
+            const newObj = {
+                code,
+                type,
+                title,
+                [element]: value
+            };
+
+            const hasItem = accumulator.find(function (item, index) {
+                if (item.code == code) {
+                    accumulator[index] = { ...accumulator[index], ...newObj };
+                    return true;
+                }
+            });
+
+            if (!hasItem) {
+                return [...accumulator, newObj];
+            }
+            return accumulator;
+        }
+
+        const test = data.reduce(reducer, []);
+
+        document.getElementById("demo").innerHTML = JSON.stringify(test);
+    </script>
+
+</body>
+
+</html>

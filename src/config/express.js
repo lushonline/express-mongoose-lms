@@ -14,7 +14,16 @@ const APPError = require('../server/helpers/AppError');
 
 const models = require('../models');
 
-const { home, login, player, logout, library, hacp, register } = require('../server/routes');
+const {
+  home,
+  login,
+  player,
+  logout,
+  library,
+  hacp,
+  register,
+  results,
+} = require('../server/routes');
 
 const app = express();
 
@@ -61,6 +70,7 @@ app.use('/logout', logout);
 app.use('/library', library);
 app.use('/hacp', hacp);
 app.use('/register', register);
+app.use('/results', results);
 
 // if error is not an instanceOf APPError, convert it.
 app.use((err, req, res, next) => {

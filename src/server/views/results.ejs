@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <%- include('partials/head'); %>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then DataTables and final PapaParse -->
+    <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap5.min.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <%- include('partials/header'); %>
+    </header>
+
+    <main role="main" class="container">
+      <% if (user) { %>
+        <div class="row p-3 p-md-5 m-md-3">
+          <div class="col">
+            <table id="results" class="table table-striped table-bordered"></table>
+          </div>
+        </div>
+
+        <% if (items) { %>
+          <script>
+            var dataset = JSON.parse('<%- JSON.stringify(items) %>');
+          </script>
+          <% } %>
+            <script>
+              $(document).ready(function () {
+                $('#results').DataTable({
+                  data: dataset,
+                  columns: [
+                    { data: "type", title: "Content Type" },
+                    { data: "code", title: "Course Code" },
+                    { data: "title", title: "Title" },
+                    {
+                      data: "status", title: "Status"
+                    },
+                    {
+                      data: "durartion", title: "Duration"
+                    },
+                    {
+
+                      data: "score", title: "Score"
+                    }
+                  ]
+                });
+              });
+            </script>
+            <% } %>
+    </main>
+    <footer class="container">
+      <%- include('partials/footer'); %>
+    </footer>
+  </div>
+</body>
+
+</html>
